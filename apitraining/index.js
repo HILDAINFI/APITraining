@@ -3,53 +3,22 @@ const app = express()
 const bodyParser=require('body-parser')
 const morgan=require('morgan')
 const mongoose=require('mongoose')
-
+const Product=require('./models/product')
+const productsRouter=require('./routers/products')
 app.use(bodyParser.json())
 app.use(morgan('tiny'))
 
-const productschema=mongoose.Schema({
-    Name:String,
-    image:String,
-    countInStock:Number
-})
 
-const product=mongoose.model('product',productschema)
+app.use(`/`,productsRouter)
+
+
 
 const PORT = 3000
 require('dotenv/config')
 const api = process.env.API_URL
 
-app.get(`${api}/products`, (req, res) => {
-    const products={
-        id:1,
-        name:"hilda",
-        image:"some_url"
-    }
-    res.send(products)
-})
 
-app.post(`${api}/products`, (req, res) => {
-    const product=new Product({
-        name:req.body.name,
-        image:req.body.image,
-        countInStock:req.body.countInStock
-    })
-
-    product.save().then((createdProduct=>{
-        res.status(201).json(createdProduct)
-    })).catch((err)=>{
-        res.status(500).json({
-            error:err,
-            status:false
-        })
-    })
-})
-
-mongoose.connect(process.env.CONNECTION_STRING,{
- useNewUrlParser:true,
- useUnifiedTopology:true,
- dbName:"eshop"
-})
+mongoose.connect(process.env.CONNECTION_STRING)
 
 .then(()=>{
     console.log("database connected")
@@ -62,3 +31,4 @@ mongoose.connect(process.env.CONNECTION_STRING,{
 app.listen(PORT, () => {
     console.log(`listening at ${PORT}`)
 })
+
